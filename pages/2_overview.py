@@ -37,12 +37,13 @@ st.markdown(
 
         /* Barra de progresso simulada */
         .progress-bar {
-            background-color: #37474F;
-            color: white;
-            padding: 5px;
+            background-color: #ECEFF1;
+            color: black;
             border-radius: 5px;
             width: 100%;
-            display: inline-block;
+            padding: 5px 0;
+            text-align: center;
+            font-weight: bold;
         }
         .progress {
             background-color: #1E88E5;
@@ -147,7 +148,7 @@ st.sidebar.markdown(
 df_totals_url = 'https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_totals_pt.parquet'
 df_totals = pd.read_parquet(df_totals_url)
 
-# Criar barras de progresso simuladas na coluna "Total de Registros"
+# Criar barras de progresso simuladas na coluna "total"
 max_value = df_totals["total"].max()
 
 def create_progress_bar(value):
@@ -160,7 +161,7 @@ def create_progress_bar(value):
         </div>
     """
 
-df_totals["Total de Registros"] = df_totals["total"].apply(create_progress_bar)
+df_totals["total"] = df_totals["total"].apply(create_progress_bar)
 
 # Título centralizado
 st.markdown("<h1 class='main-title'>Overview dos Dados</h1>", unsafe_allow_html=True)
@@ -177,7 +178,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Exibir a tabela com barras de progresso
+# Exibir a tabela com barras de progresso na coluna "total"
 st.markdown('<div class="table-container">', unsafe_allow_html=True)
 st.write(df_totals.to_html(escape=False, index=False), unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
