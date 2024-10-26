@@ -34,25 +34,6 @@ st.markdown(
             justify-content: center;
             margin-top: 20px;
         }
-
-        /* Barra de progresso simulada */
-        .progress-bar {
-            background-color: #ECEFF1;
-            color: black;
-            border-radius: 5px;
-            width: 100%;
-            padding: 5px 0;
-            text-align: center;
-            font-weight: bold;
-        }
-        .progress {
-            background-color: #1E88E5;
-            height: 20px;
-            border-radius: 5px;
-            text-align: center;
-            color: white;
-            font-weight: bold;
-        }
     </style>
     """,
     unsafe_allow_html=True
@@ -148,21 +129,6 @@ st.sidebar.markdown(
 df_totals_url = 'https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_totals_pt.parquet'
 df_totals = pd.read_parquet(df_totals_url)
 
-# Criar barras de progresso simuladas na coluna "total"
-max_value = df_totals["total"].max()
-
-def create_progress_bar(value):
-    percentage = (value / max_value) * 100
-    return f"""
-        <div class="progress-bar">
-            <div class="progress" style="width: {percentage}%;">
-                {value}
-            </div>
-        </div>
-    """
-
-df_totals["total"] = df_totals["total"].apply(create_progress_bar)
-
 # Título centralizado
 st.markdown("<h1 class='main-title'>Overview dos Dados</h1>", unsafe_allow_html=True)
 
@@ -178,7 +144,25 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Exibir a tabela com barras de progresso na coluna "total"
+# Explicações de cada coluna
+explicacoes = {
+    "df_events_by_country": "Número total de eventos terroristas por país.",
+    "df_attacktype": "Tipos de ataque registrados nos eventos terroristas.",
+    "df_iyear_nkill": "Número de mortes por ano em eventos terroristas.",
+    "df_weaptype": "Tipos de armas utilizadas nos ataques.",
+    "df_suicide_country": "Ataques suicidas classificados por país.",
+    "df_region_nkill": "Número de mortes por região.",
+    "df_gname_nkill": "Grupos responsáveis e número de mortes associadas."
+}
+
+df_totals.columns = ["Quadro de Dados", "Total de Registros"]
+df_totals["Descrição"] = df_totals["Quadro de Dados"].map(explicacoes)
+
+# Exibir a tabela centralizada com a barra de progresso
 st.markdown('<div class="table-container">', unsafe_allow_html=True)
-st.write(df_totals.to_html(escape=False, index=False), unsafe_allow_html=True)
+st.dataframe(
+    df_totals.style.format({
+        "Total de Registros": "{:,.0f}"  # Formata com separador de milhares
+    })
+)
 st.markdown('</div>', unsafe_allow_html=True)
