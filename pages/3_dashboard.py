@@ -15,7 +15,7 @@ st.sidebar.markdown(
     .sidebar .sidebar-content {
         background-color: #ECEFF1;
         color: #37474F;
-        font-size: 0.6em; /* Reduzido para metade do tamanho original */
+        font-size: 0.6em;
     }
     .sidebar h1, .sidebar h2, .sidebar h3, .sidebar h4, .sidebar h5, .sidebar h6 {
         color: #1E88E5;
@@ -26,7 +26,7 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# Logo da Unifor centralizada acima dos elementos
+# Logo da Unifor centralizada na barra lateral
 st.sidebar.markdown(
     """
     <div style="text-align: center; margin-bottom: 10px;">
@@ -36,7 +36,7 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# Título dos participantes do projeto com menor fonte e centralizado
+# Título dos participantes
 st.sidebar.markdown(
     """
     <div style="text-align: center; color: #1E88E5; font-size: 0.7em; font-weight: bold;">Participantes do Projeto</div>
@@ -44,7 +44,7 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# Lista de participantes com ícones de LinkedIn e GitHub menores
+# Lista de participantes
 participants = {
     "Denis Neres Caminha": {
         "LinkedIn": "https://www.linkedin.com/in/denis-caminha-53ab05b6/",
@@ -64,6 +64,7 @@ participants = {
     }
 }
 
+# Ícones de LinkedIn e GitHub
 linkedin_icon = "https://cdn-icons-png.flaticon.com/512/174/174857.png"
 github_icon = "https://cdn-icons-png.flaticon.com/512/25/25231.png"
 
@@ -83,7 +84,7 @@ for name, links in participants.items():
         unsafe_allow_html=True
     )
 
-# Link do repositório do projeto no GitHub
+# Link do repositório do GitHub na barra lateral
 st.sidebar.markdown(
     """
     <div style="text-align: center; color: #1E88E5; font-size: 0.7em; font-weight: bold;">Links do Projeto</div>
@@ -125,9 +126,9 @@ st.markdown(
 )
 
 # Função para carregar e exibir gráficos com controle deslizante
-def load_and_display_chart(df_path, index_column, value_column, title, description):
+def load_and_display_chart(url, index_column, value_column, title, description):
     try:
-        df = pd.read_parquet(df_path)
+        df = pd.read_parquet(url)
         df = df.sort_values(by=value_column, ascending=False)
         
         max_records = len(df)
@@ -141,65 +142,67 @@ def load_and_display_chart(df_path, index_column, value_column, title, descripti
         st.markdown(f"<div class='description'>{description}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
     
-    except FileNotFoundError:
-        st.error(f"O arquivo '{df_path}' não foi encontrado.")
-    except KeyError:
-        st.error(f"As colunas '{index_column}' e '{value_column}' não foram encontradas no DataFrame.")
+    except Exception as e:
+        st.error(f"Erro ao carregar o arquivo '{url}': {e}")
 
 # Título e introdução do dashboard
 st.markdown("<h1 class='main-title'>Dashboard de Análises</h1>", unsafe_allow_html=True)
 st.markdown("Explore visualizações e insights sobre os dados de terrorismo.")
+
+# URLs para os arquivos Parquet no GitHub
+file_urls = {
+    'Número de Ataques por Tipo': ('https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_attacktype_pt.parquet', 'tipo_ataque', 'quantidade'),
+    'Número de Ataques por País': ('https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_events_by_country_pt.parquet', 'pais', 'quantidade'),
+    'Número de Mortes por Grupo': ('https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_gname_nkill_pt.parquet', 'grupo', 'soma_mortes'),
+    'Número de Mortes por Ano': ('https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_iyear_nkill_pt.parquet', 'ano', 'soma_mortes'),
+    'Número de Ataques Suicidas por País': ('https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_suicide_country_pt.parquet', 'pais', 'quantidade'),
+    'Número de Mortes por Região': ('https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_region_nkill_pt.parquet', 'regiao', 'soma_mortes'),
+    'Número de Ataques por Tipo de Arma': ('https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_weaptype_pt.parquet', 'tipo_arma', 'quantidade')
+}
 
 # Layout de colunas para distribuir os gráficos
 col1, col2 = st.columns(2)
 
 with col1:
     load_and_display_chart(
-        r'C:\Users\User\OneDrive\00-ciencias-de-dados\det\datasets\df_attacktype_pt.parquet',
-        'tipo_ataque', 'quantidade', 
+        *file_urls['Número de Ataques por Tipo'],
         'Número de Ataques por Tipo', 
-        'Este gráfico mostra o número de ataques classificados por tipo. Os dados ajudam a entender os métodos mais utilizados pelos terroristas.'
+        'Este gráfico mostra o número de ataques classificados por tipo, ajudando a entender os métodos mais utilizados pelos terroristas.'
     )
 
     load_and_display_chart(
-        r'C:\Users\User\OneDrive\00-ciencias-de-dados\det\datasets\df_events_by_country_pt.parquet',
-        'pais', 'quantidade', 
+        *file_urls['Número de Ataques por País'],
         'Número de Ataques por País', 
         'Distribuição dos ataques por país, oferecendo uma visão das regiões mais afetadas pelo terrorismo.'
     )
 
     load_and_display_chart(
-        r'C:\Users\User\OneDrive\00-ciencias-de-dados\det\datasets\df_gname_nkill_pt.parquet',
-        'grupo', 'soma_mortes', 
+        *file_urls['Número de Mortes por Grupo'],
         'Número de Mortes por Grupo', 
         'Mostra os grupos responsáveis pelo maior número de mortes em ataques terroristas.'
     )
 
 with col2:
     load_and_display_chart(
-        r'C:\Users\User\OneDrive\00-ciencias-de-dados\det\datasets\df_iyear_nkill_pt.parquet',
-        'ano', 'soma_mortes', 
+        *file_urls['Número de Mortes por Ano'],
         'Número de Mortes por Ano', 
         'A evolução anual do número de mortes em ataques terroristas ao longo do tempo.'
     )
 
     load_and_display_chart(
-        r'C:\Users\User\OneDrive\00-ciencias-de-dados\det\datasets\df_suicide_country_pt.parquet',
-        'pais', 'quantidade', 
+        *file_urls['Número de Ataques Suicidas por País'],
         'Número de Ataques Suicidas por País', 
         'Número de ataques suicidas distribuídos por país, indicando regiões onde essa tática é mais comum.'
     )
 
     load_and_display_chart(
-        r'C:\Users\User\OneDrive\00-ciencias-de-dados\det\datasets\df_region_nkill_pt.parquet',
-        'regiao', 'soma_mortes', 
+        *file_urls['Número de Mortes por Região'],
         'Número de Mortes por Região', 
         'Distribuição do número de mortes em ataques terroristas por região.'
     )
 
     load_and_display_chart(
-        r'C:\Users\User\OneDrive\00-ciencias-de-dados\det\datasets\df_weaptype_pt.parquet',
-        'tipo_arma', 'quantidade', 
+        *file_urls['Número de Ataques por Tipo de Arma'],
         'Número de Ataques por Tipo de Arma', 
         'Frequência de uso de diferentes tipos de armas em ataques terroristas.'
     )
