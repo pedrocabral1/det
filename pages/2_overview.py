@@ -39,14 +39,14 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Configuração da barra lateral
+# Configuração da barra lateral (compartilhada entre as páginas)
 st.sidebar.markdown(
     """
     <style>
     .sidebar .sidebar-content {
         background-color: #ECEFF1;
         color: #37474F;
-        font-size: 0.6em; /* Reduzido para metade do tamanho original */
+        font-size: 0.6em;
     }
     .sidebar h1, .sidebar h2, .sidebar h3, .sidebar h4, .sidebar h5, .sidebar h6 {
         color: #1E88E5;
@@ -95,7 +95,6 @@ participants = {
     }
 }
 
-# Ícones menores para LinkedIn e GitHub centralizados
 linkedin_icon = "https://cdn-icons-png.flaticon.com/512/174/174857.png"
 github_icon = "https://cdn-icons-png.flaticon.com/512/25/25231.png"
 
@@ -115,7 +114,7 @@ for name, links in participants.items():
         unsafe_allow_html=True
     )
 
-# Link do repositório do projeto no GitHub com menor fonte e centralizado
+# Link do repositório do projeto no GitHub
 st.sidebar.markdown(
     """
     <div style="text-align: center; color: #1E88E5; font-size: 0.7em; font-weight: bold;">Links do Projeto</div>
@@ -126,9 +125,9 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# Carregar os dados do arquivo Parquet
-file_path = r'C:\Users\User\OneDrive\00-ciencias-de-dados\det\datasets\df_totals_pt.parquet'
-df_totals = pd.read_parquet(file_path)
+# Carregar dados do arquivo Parquet diretamente do GitHub
+df_totals_url = 'https://raw.githubusercontent.com/pedrocabral1/det/main/datasets/df_totals_pt.parquet'
+df_totals = pd.read_parquet(df_totals_url)
 
 # Título centralizado
 st.markdown("<h1 class='main-title'>Overview dos Dados</h1>", unsafe_allow_html=True)
@@ -162,11 +161,8 @@ df_totals["Descrição"] = df_totals["Quadro de Dados"].map(explicacoes)
 # Exibir a tabela centralizada com a barra de progresso
 st.markdown('<div class="table-container">', unsafe_allow_html=True)
 st.dataframe(
-    df_totals,
-    column_config={
-        "Total de Registros": st.column_config.ProgressColumn(
-            "Total de Registros", format="%d", min_value=0, max_value=df_totals["Total de Registros"].max()
-        )
-    }
+    df_totals.style.format({
+        "Total de Registros": "{:,.0f}"  # Formata com separador de milhares
+    })
 )
 st.markdown('</div>', unsafe_allow_html=True)
